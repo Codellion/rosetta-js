@@ -1,0 +1,25 @@
+<table style="border: 1px; border-style: solid;" dt-style.display="#this.results.length > 0? 'block': 'none'">
+	<thead>
+		<tr style="border: 1px; border-style: solid;">
+			<th></th>
+			<th>Dirección</th>				
+			<th>Detalle</th>
+		</tr>
+	</thead>
+	<tbody dt-children="results">
+		<tr>
+			<td><a href="#address/detail" dt-onclick="@address.selectAddress(this)">Select</a></td>
+			<td><span dt-innerHTML="formatted_address"></span></td>
+			<td>
+				<table style="border: 1px; border-style: solid;">
+					<tbody dt-children="address_components">
+						<tr style="border: 1px; border-style: solid;">
+							<td><span dt-innerHTML="short_name"></span></td>	
+							<td><span dt-innerHTML="long_name"></span></td>	
+						</tr>
+					</tbody>
+				</table>
+			</td>
+		</tr>
+	</tbody>
+</table>

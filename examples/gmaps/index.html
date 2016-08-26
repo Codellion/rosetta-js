@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>rosettaJS PoC</title>
+<script src="../../node_modules/duet-js/duet.min.js"></script>
+<script src="../../build/rosetta.js"></script>
+<script src="app-init.js"></script>
+<script src="addressController.js"></script>
+
+</head>
+<body rosetta="gmapApp">
+	<div>
+		<div dt-style.display="loading">
+			CARGANDO...
+		</div>
+		<h1 dt-innerHTML="title"></h1>
+		<div controller="address" >
+			<div dt-style.display="#this.selectedAddress ? 'none': 'block'">
+				<p controller="subController"> 
+					Estado de la llamada: <span dt-innerHTML="result"></span>
+				</p>
+				<label for="address">Introduzca dirección:</label>
+				<input type="text" dt-value="address" name="address" />
+				<br />
+				<br />
+				<span dt-style.display="#this.results.length == 0? 'block': 'none'">No se han encontrado resultados</span>
+			</div>
+			<div partialView="content"></div>
+		</div>
+    </div>
+</body>
+
+</html>

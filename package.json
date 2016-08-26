@@ -1,8 +1,8 @@
 {
   "name": "rosetta-js",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "MVC duet-js plugin",
-  "main": "index.js",
+  "main": "rosetta.js",
   "directories": {
     "doc": "doc"
   },
@@ -22,6 +22,9 @@
     "url": "https://github.com/Codellion/rosetta-js/issues"
   },
   "homepage": "https://github.com/Codellion/rosetta-js#readme",
+  "dependencies": {
+    "duet-js": "^0.4.0"
+  },
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-contrib-concat": "^0.5.1",

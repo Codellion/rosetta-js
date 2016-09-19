@@ -1,0 +1,28 @@
+{
+  "name": "rosetta-js",
+  "description": "rosettaJS is a duetJS plugin to create SPA with a MVC pattern",
+  "main": "rosetta.js",
+  "authors": [
+    "Antonio José Fernández Castillo"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "MVVM",
+    "Javascript",
+    "client",
+    "framework",
+    "typescript",
+    "duet-js",
+    "MVC",
+    "angularJS"
+  ],
+  "homepage": "https://github.com/Codellion/rosetta-js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+	"private": true
+}

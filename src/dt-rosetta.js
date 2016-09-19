@@ -13,6 +13,8 @@
 		this.onLoad = [];
 		this.controllers = {};
 		this.cacheControllers = {};
+		this.tags = {};
+		this.tagsRepository = 0;
 	}	
 
 	//EXTENSIÓN DEL MODELO DUET-JS
@@ -68,7 +70,7 @@
 			return func;
 		else
 			return res;
-	}
+	};
 
 	duet.fn.module = function(name, dep, module, cacheable, loadedModules) {
 		if(module) {
@@ -90,7 +92,7 @@
 	duet.fn.getRosettaApp = function() {
 		if(duet.cacheModules[duet.rosettaApp])
 			return duet.cacheModules[duet.rosettaApp];
-	}
+	};
 
 	//MODULOS BASE
 
@@ -100,6 +102,16 @@
 		if(app)
 			return app.rootContext;
 	});	
+
+	duet.module("DOMParser", null, function(context){
+
+		context.parser = new DOMParser();
+
+		context.parseHTML = function(string) {
+			return context.parser.parseFromString(string, "text/html");
+		};
+
+	}, true);
 
 	//MODULO APP ROSETTA MVC
 
@@ -204,6 +216,152 @@
 			};
 		}
 	};
+
+	//Registro de componentes
+	RosettaApp.prototype.tag = function(name, dep, tag) {
+
+		var app = this;
+
+		if(tag) {
+			var parser = duet.module("DOMParser");			
+
+			app.tags[name] = function() {
+				var newComponent = Object.create(HTMLElement.prototype);
+				
+				newComponent.tag = tag;
+				newComponent.behavior = function(behaviorName, args) {
+					if(this.behaviors[this.state()][behaviorName])
+						return this.behaviors[this.state()][behaviorName].apply(this, args);
+					else if(this.behaviors["shared"] && this.behaviors["shared"][behaviorName])
+						return this.behaviors["shared"][behaviorName].apply(this, args);
+				};
+				newComponent.state = function(state) {
+					if(state) {
+						if(!this.binding)
+							this.binding = {};
+
+						this.binding.state = state;
+					}
+					else if(this.binding)
+						return this.binding.state;
+				};
+				newComponent.model = function() {
+					var _self = this;
+
+					if(duet.subModelViews && duet.subModelViews[_self.rosettaID]) {
+						var _aux = duet.subModelViews[_self.rosettaID].getSimpleModel();
+						_self.data = _aux.data;
+						_self.states = _aux.states;
+					}				
+					else {
+						var _tag = _self.tag();
+						_self.data = _tag.data;
+						_self.states = _tag.states;
+					}	
+
+					var _model = {
+						data: _self.data,
+						states: _self.states,
+						actions: {},
+						state: _self.state()
+					};
+
+					var newFunc = function(name) {
+						var _action = name;
+						return function() {
+							_self.behavior(_action);
+						}
+					};
+
+					for(var i=0; i<_self.actions.length;i++) {
+						var action = _self.actions[i];
+						_model.actions[action] = newFunc(action);
+					}
+
+					_self.binding = _model;
+					return _self.binding;
+				};
+				newComponent.init = function() {
+					var _self = this; 	
+					var _isDuetBinding = duet.extension.rosetta.hasDuetBindings(this);
+
+					if(_isDuetBinding && !_self.lazyInit)
+						return;
+
+					while (_self.firstChild) {
+					    _self.removeChild(_self.firstChild);
+					}
+
+					var _dtModel = _self.model();
+
+					if(_self.dataset.dt && duet.subModelViews[_self.dataset.dt])
+						duet.subModelViews[_self.dataset.dt].refreshUI();
+
+					if(_self.rosettaID == "") {
+						app.tagsRepository++;
+						_self.rosettaID = "rosetta.tag.ID." + name + "." + app.tagsRepository;
+					}					
+
+					_self.state("default");
+					var render = parser.parseHTML('<div>' + _self.behavior("render") + '</div>').body.firstChild;
+
+					duet.extension.rosetta.bindCtrlChildNodes(render, _self.rosettaID);
+
+					_self.appendChild(render);
+					duet.bind(_dtModel, _self.rosettaID, true);
+
+					if(_self.behaviors[_self.state()].init) {
+						_self.behavior("init");
+					} 
+
+					_self.binding._state.subscribe(function(binding) {
+						if(_self.behaviors[_self.state()].init) {
+							_self.behavior("init");
+						} 
+
+						if(_self.behaviors[_self.state()].render && _self.isDirtyDOM) {
+							_self.isDirtyDOM = false;
+
+							while (_self.firstChild) {
+							    _self.removeChild(_self.firstChild);
+							}			
+
+							var render = parser.parseHTML('<div>' + _self.behavior("render") + '</div>').body.firstChild;
+
+							duet.extension.rosetta.bindCtrlChildNodes(render, _self.rosettaID);
+
+							_self.appendChild(render);
+							//duet.bind(_self.model(), _self.rosettaID, true);
+							duet.bind(_self.binding, _self.rosettaID, true);
+
+						}
+
+						if(_self.behaviors[_self.state()].render)
+							_self.isDirtyDOM = true;
+						else
+							_self.isDirtyDOM = false;
+					});
+				};
+
+				newComponent.rosettaID = '';
+				newComponent.isDirtyDOM = true;
+				newComponent.binding = {};
+				newComponent.lazyInit = false;
+
+				var merge = duet.injectDep(tag, dep, app);	
+
+				for(var prop in merge) {
+					newComponent[prop] = merge[prop];					
+				};		
+				
+				newComponent.createdCallback = function() { this.init(); };
+
+				window[name] = document.registerElement('x-' + name, {prototype: newComponent});
+			};
+
+			app.tags[name]();
+		}
+	}
 
 	//Bootstrap de Rosetta
 	RosettaApp.prototype.bootstrap = function() {
@@ -371,6 +529,31 @@
 		for(var i in pageCtrls) {
 			duet.extension.rosetta.configController(pageCtrls, pageCtrls[i].name, instanceCtrl, pageCtrls[i]);
 		}
+	}
+
+	duet.extension.rosetta.hasDuetBindings = function(domObj) {
+		var validNode = false;
+
+		if(domObj.attributes.hasOwnProperty("dt") || domObj.attributes.hasOwnProperty("data-dt")){
+			validNode = (domObj.attributes.hasOwnProperty("dt") || domObj.attributes.hasOwnProperty("data-dt"));
+		}
+
+		if(!validNode){
+			for(var j=0; j<domObj.attributes.length && !validNode; j++){
+				var attr = domObj.attributes[j];
+				var attrName = attr.name;
+
+				if(attr.name.indexOf('data-') == 0){
+					attrName = attr.name.slice(5);
+				}
+
+				if(attrName.indexOf('dt') == 0 || attrName.indexOf('dt') == 0 && attrName != "dt-binding-generation") {
+					validNode = true;
+				}
+			}
+		}
+
+		return validNode;
 	}
 
 

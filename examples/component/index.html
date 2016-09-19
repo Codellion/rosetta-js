@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>rosettaJS PoC</title>
+<script src="../../node_modules/duet-js/duet.min.js"></script>
+<script src="../../build/rosetta.js"></script>
+<script src="app.js"></script>
+<style type="text/css">
+	.bolder {
+		font-weight: bold;
+	}
+</style>
+</head>
+<body rosetta="componentExample">	
+	<div controller="compCtrl">
+		<div>Prueba concepto componente</div>
+		<input type="button" dt-onclick="@this.changeText()" value="Cambiar descripción" />
+		<x-photoflickr id="xphoto1" dt-data.title="#this.title"></x-photoflickr>
+		<x-photoflickr id="xphoto2" data-title="HOLA MUNDO!!"></x-photoflickr>
+		<x-photoflickr id="xphoto3" data-title dt-dataset.title="title"></x-photoflickr>
+		<x-photoflickr id="xphoto4"></x-photoflickr>
+		<script type="text/javascript">
+			var photo = document.getElementById('xphoto4');
+			photo.data.title = "HOLA MUNDO!!";
+		</script>
+		<div id="xphoto5"></div>
+		<script type="text/javascript">
+			var xphoto5 = new photoflickr();
+			xphoto5.data.title = "HOLA MUNDO!!";
+			document.getElementById('xphoto5').appendChild(xphoto5);
+		</script>
+	</div>
+</body>
+
+</html>

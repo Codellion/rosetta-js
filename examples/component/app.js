@@ -3,11 +3,14 @@ duet.module('flickr', ['http'], function(context, http) {
 
 	context.photos = [];
 
-	context.getPhotos = function() {
+	context.getPhotos = function(callback) {
 		http.jsonp('https://api.flickr.com/services/feeds/photos_public.gne?format=json', function(data) {
 			if(data) {
 				context.photos = data.items;
 			}
+
+			if(callback)
+				callback();
 		}, 'jsonFlickrFeed');
 	};
 
@@ -23,35 +26,41 @@ app.tag('photoflickr', null, function(context) {
 			link: '',
 			image: '',
 			tags: [],
-			title: ''
+			title: '',
+			URLImage: function() {
+				return "url("+ this.image + ") no-repeat";
+			}
 		},
 		states: {
-			class: ''
+			class: '',
+			over: 'none'
 		},
 		actions: ["render", "changeHover", "changeHoverOut", "flipDetail"],
 		behaviors: {
 			"shared" : {
 				changeHover: function() {
-					this.states.class = "bolder";
+					this.states.over = "";
 				},
 				changeHoverOut: function() {
-					this.states.class = "";
+					this.states.over = "none";
 				}
 			},
 			"default" : {
 				init: function() {
-					if(this.dataset.title)
-						this.data.title = this.dataset.title;
+					//if(this.dataset.title)
+					//	this.data.title = this.dataset.title;
+					this.states.over = "none";
 				},
 				flipDetail: function() {
-					this.data.title = "PERFECT";
-					this.data.description = "dessss";
 					this.state("detail");
 				},
 				render: function() {
-					return 	"<div dt-onmouseenter='@this.actions.changeHover()' dt-onmouseleave='@this.actions.changeHoverOut()' dt-onclick='@this.actions.flipDetail()'>"
-						+ 		"<span dt-class-Name='#this.states.class' dt-innerHTML='#this.data.title'></span>"
-						+ 	"</div>";
+					return 	'<div class="fill" dt-style.background="#this.data.URLImage()" dt-onclick="@this.actions.flipDetail()"'
+						+	' dt-onmouseenter="@this.actions.changeHover()" dt-onmouseleave="@this.actions.changeHoverOut()">'
+						+	'	<div dt-style.display="#this.states.over" class="fill" style="background-color: black;position: absolute;float: left;opacity: 0.5;">'
+						+	'		<span style="word-break:break-all;position:absolute;" dt-inner-Text="#this.data.title"></span>';
+						+ 	'	</div>'
+						+	'</div>'
 				}
 			},
 			"detail" : {
@@ -59,39 +68,27 @@ app.tag('photoflickr', null, function(context) {
 					this.state("default");
 				},
 				render: function() {
-					return 	"<div dt-onmouseenter='@this.actions.changeHover()' dt-onmouseleave='@this.actions.changeHoverOut()' dt-onclick='@this.actions.flipDetail()'>"
-						+ 		"<span dt-class-Name='#this.states.class' dt-innerHTML='#this.data.description'></span>"
-						+ 	"</div>";
+					return 	'<div class="fill" dt-style.background="#this.data.URLImage()">'
+						+	'	<div  dt-onmouseleave="@this.actions.flipDetail()" class="fill" style="background-color: black;position: absolute;float: left;opacity: 0.5;">'
+						+	'		<span style="word-break:break-all;position:absolute;" dt-inner-Text="#this.data.title"></span>';
+						+ 	'	</div>'
+						+	'</div>'
 				}
 			},
 		}
 	};
 });
 
-app.init(['flickr'], function(context, flickr){
-	flickr.getPhotos();
-});
+app.controller('compCtrl', ['flickr'], function(context, flickr) {
+	context.model.photos = [];
 
-app.controller('compCtrl', null, function(context) {
-	context.model.title = "HOLA MUNDO!!";
-
-	context.model.changeText = function() {
-		context.model.title = "oooooook";
+	context.model.refreshPhotos = function() {
+		flickr.getPhotos(function() {
+			context.model.photos = flickr.photos;
+		});
 	}
+
+	context.model.refreshPhotos();
 });
 
 app.bootstrap();
-
-
-
-function test() {
-	/*
-	app.components.photoFlickr();
-	var newComp = document.createElement('x-photoFlickr');
-	newComp.data.title = "HOLA MUNDO!!!";	
-	newComp.data.description = "Esta prueba ha funcionado correctamente!!!";	
-	document.querySelector('#comp').appendChild(newComp)
-	newComp.init();
-	*/
-
-}

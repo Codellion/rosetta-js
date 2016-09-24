@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/Codellion/rosetta-js#readme",
   "dependencies": {
-    "duet-js": "^0.4.2"
+    "duet-js": "^0.4.3"
   },
   "devDependencies": {
     "grunt": "^0.4.5",
@@ -31,6 +31,6 @@
     "grunt-contrib-concat": "^0.5.1",
     "grunt-contrib-jshint": "^0.11.3",
     "grunt-contrib-uglify": "^0.11.0",
-    "duet-js": "^0.4.2"
+    "duet-js": "^0.4.3"
   }
 }

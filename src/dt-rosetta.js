@@ -281,7 +281,7 @@
 					_self.binding = _model;
 					return _self.binding;
 				};
-				newComponent.init = function() {
+				newComponent.init = function(modelView) {
 					var _self = this; 	
 					var _isDuetBinding = duet.extension.rosetta.hasDuetBindings(this);
 
@@ -294,8 +294,9 @@
 
 					var _dtModel = _self.model();
 
-					if(_self.dataset.dt && duet.subModelViews[_self.dataset.dt])
-						duet.subModelViews[_self.dataset.dt].refreshUI();
+					if(_self.dataset.dt && modelView) {
+						modelView.refreshUI();
+					}
 
 					if(_self.rosettaID == "") {
 						app.tagsRepository++;
@@ -303,11 +304,16 @@
 					}					
 
 					_self.state("default");
-					var render = parser.parseHTML('<div>' + _self.behavior("render") + '</div>').body.firstChild;
 
-					duet.extension.rosetta.bindCtrlChildNodes(render, _self.rosettaID);
+					var render = parser.parseHTML(_self.behavior("render")).body;
 
-					_self.appendChild(render);
+					for(var chld=0; chld < render.children.length; chld++) {
+						var child = render.children[chld];
+						_self.appendChild(child.cloneNode(true));
+					}
+
+					duet.extension.rosetta.bindCtrlChildNodes(_self, _self.rosettaID);
+
 					duet.bind(_dtModel, _self.rosettaID, true);
 
 					if(_self.behaviors[_self.state()].init) {
@@ -326,12 +332,15 @@
 							    _self.removeChild(_self.firstChild);
 							}			
 
-							var render = parser.parseHTML('<div>' + _self.behavior("render") + '</div>').body.firstChild;
+							var render = parser.parseHTML(_self.behavior("render")).body;
 
-							duet.extension.rosetta.bindCtrlChildNodes(render, _self.rosettaID);
+							for(var chld=0; chld < render.children.length; chld++) {
+								var child = render.children[chld];
+								_self.appendChild(child.cloneNode(true));
+							}
 
-							_self.appendChild(render);
-							//duet.bind(_self.model(), _self.rosettaID, true);
+							duet.extension.rosetta.bindCtrlChildNodes(_self, _self.rosettaID);
+
 							duet.bind(_self.binding, _self.rosettaID, true);
 
 						}
@@ -347,6 +356,7 @@
 				newComponent.isDirtyDOM = true;
 				newComponent.binding = {};
 				newComponent.lazyInit = false;
+				newComponent.typeName = name;
 
 				var merge = duet.injectDep(tag, dep, app);	
 
@@ -356,7 +366,7 @@
 				
 				newComponent.createdCallback = function() { this.init(); };
 
-				window[name] = document.registerElement('x-' + name, {prototype: newComponent});
+				window[name] = document.registerElement('dt-' + name, {prototype: newComponent});
 			};
 
 			app.tags[name]();

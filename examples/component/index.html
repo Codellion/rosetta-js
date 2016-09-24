@@ -3,19 +3,34 @@
 <head>
 <meta charset="UTF-8">
 <title>rosettaJS PoC</title>
+<script src="//cdnjs.cloudflare.com/ajax/libs/document-register-element/1.1.1/document-register-element.js"></script>
 <script src="../../node_modules/duet-js/duet.min.js"></script>
+<!--<script src="../../../duet-js/build/duet.js"></script>-->
 <script src="../../build/rosetta.js"></script>
 <script src="app.js"></script>
 <style type="text/css">
 	.bolder {
 		font-weight: bold;
 	}
+	.fill {
+		float:left; 
+    	border:0;
+	    background-size: cover !important;
+    	background-clip: border-box !important;
+    	min-width: 250px;
+    	min-height: 200px;
+	}
 </style>
 </head>
-<body rosetta="componentExample">	
+<body rosetta="componentExample" style="background-color:black; color:white;">	
 	<div controller="compCtrl">
-		<div>Prueba concepto componente</div>
-		<input type="button" dt-onclick="@this.changeText()" value="Cambiar descripción" />
+		<div>Galeria Flickr</div>
+		<input type="button" dt-onclick="@this.refreshPhotos()" value="Refrescar fotos" />
+		<div>Ultimas fotos</div>
+		<div style="width: 100%; margin-top:20px;" dt-children="photos">
+			<dt-photoflickr dt-data.title="title" dt-data.image="#this.media.m" dt-data.description="description"></x-photoflickr>
+		</div>
+		<!--
 		<x-photoflickr id="xphoto1" dt-data.title="#this.title"></x-photoflickr>
 		<x-photoflickr id="xphoto2" data-title="HOLA MUNDO!!"></x-photoflickr>
 		<x-photoflickr id="xphoto3" data-title dt-dataset.title="title"></x-photoflickr>
@@ -30,6 +45,7 @@
 			xphoto5.data.title = "HOLA MUNDO!!";
 			document.getElementById('xphoto5').appendChild(xphoto5);
 		</script>
+		-->
 	</div>
 </body>
 

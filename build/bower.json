@@ -2,7 +2,7 @@
   "name": "rosetta-js",
   "description": "rosettaJS is a duetJS plugin to create SPA with a MVC pattern",
   "main": "rosetta.js",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "authors": [
     "Antonio José Fernández Castillo"
   ],

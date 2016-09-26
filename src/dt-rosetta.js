@@ -36,7 +36,9 @@
 			var loadedExtModules = {};
 
 			for(var i in dep) {
-				if(duet.modules[dep[i]]){
+				if(app && app.components[dep[i]])
+					depInstances.push(app.component(dep[i]));
+				else if(duet.modules[dep[i]]){
 					var mod;
 
 					if(loadedModules && loadedModules[dep[i]])
@@ -285,6 +287,10 @@
 					var _self = this; 	
 					var _isDuetBinding = duet.extension.rosetta.hasDuetBindings(this);
 
+					if(!modelView && duet.subModelViews[_self.dataset.dt]) {
+						_self.lazyInit = true;
+					}
+
 					if(_isDuetBinding && !_self.lazyInit)
 						return;
 
@@ -294,8 +300,11 @@
 
 					var _dtModel = _self.model();
 
-					if(_self.dataset.dt && modelView) {
-						modelView.refreshUI();
+					if(_self.dataset.dt) {
+						if(modelView) 
+							modelView.refreshUI();
+						else if(duet.subModelViews[_self.dataset.dt])
+							duet.subModelViews[_self.dataset.dt].refreshUI();						
 					}
 
 					if(_self.rosettaID == "") {

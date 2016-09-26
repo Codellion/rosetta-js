@@ -1,6 +1,6 @@
 {
   "name": "rosetta-js",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "MVC duet-js plugin",
   "main": "rosetta.js",
   "directories": {

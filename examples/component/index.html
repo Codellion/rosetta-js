@@ -8,28 +8,18 @@
 <!--<script src="../../../duet-js/build/duet.js"></script>-->
 <script src="../../build/rosetta.js"></script>
 <script src="app.js"></script>
-<style type="text/css">
-	.bolder {
-		font-weight: bold;
-	}
-	.fill {
-		float:left; 
-    	border:0;
-	    background-size: cover !important;
-    	background-clip: border-box !important;
-    	min-width: 250px;
-    	min-height: 200px;
-	}
-</style>
+<script src="tags/photoflickr.js"></script>
+<script src="tags/photoflickrList.js"></script>
+<script src="components/flickr.js"></script>
+<script src="controllers/compCtrl.js"></script>
+<link rel="stylesheet" type="text/css" href="css/style.css">	
 </head>
 <body rosetta="componentExample" style="background-color:black; color:white;">	
 	<div controller="compCtrl">
 		<div>Galeria Flickr</div>
 		<input type="button" dt-onclick="@this.refreshPhotos()" value="Refrescar fotos" />
 		<div>Ultimas fotos</div>
-		<div style="width: 100%; margin-top:20px;" dt-children="photos">
-			<dt-photoflickr dt-data.title="title" dt-data.image="#this.media.m" dt-data.description="description"></x-photoflickr>
-		</div>
+		<dt-photoflickrList dt-data.photos="photos"></dt-photoflickrList>
 		<!--
 		<x-photoflickr id="xphoto1" dt-data.title="#this.title"></x-photoflickr>
 		<x-photoflickr id="xphoto2" data-title="HOLA MUNDO!!"></x-photoflickr>

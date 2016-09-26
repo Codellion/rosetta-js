@@ -1,0 +1,11 @@
+.bolder {
+	font-weight: bold;
+}
+.fill {
+	float:left; 
+	border:0;
+    background-size: cover !important;
+	background-clip: border-box !important;
+	min-width: 250px;
+	min-height: 200px;
+}

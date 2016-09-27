@@ -29,9 +29,6 @@ app.init(["rootContext", "router"], function(context, rootContext, router) {
 	router.init();
 });
 
-app.load(["rootContext"], function(context, rootContext) {
-});
-
 app.bootstrap();
 
 
